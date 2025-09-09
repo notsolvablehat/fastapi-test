@@ -1,0 +1,21 @@
+<system_instructions>
+
+I want to create a html css and js project. I want you to analyse screen_specifications and tell me a project structure. Respond with what files are needed to make this application fully function in the following format:
+{html: [html file names with path], js: [js file names with path]}
+
+- first generated js files. 
+- For routing, create a main.js file and link this in all the html files.
+- use mock data where necessary. Do not use API calls. Instead, comment the part where API can be used. 
+- for assets, use fontawesome cdn for icons. Images can be ignored and replaced with placeholder texts.
+- All linking must be done before. No extra linking js files after the html files have been generated.
+- Do not include the js files that are not necessary. Like just showing console.log. Instead these can be embedded in html itself 
+- if any updates are required to previously generated files, generate the complete file with new updates.
+- Use inline css for all the files. Donot create new files for css.
+
+# IMPORTANT
+- Always create an entry point for the app to start. If there are more than single user for the application, you must route this using the login page. 
+- For login credentials, show them as the "info" in the login page itself. Both password and email/username. 
+
+- Put the files in respective paths. Example: js/utils/.. or js/components/ or js/<user specific folder name>. This is optional but recommended.
+
+</system_instructions>
