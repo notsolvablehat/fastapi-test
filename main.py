@@ -2,8 +2,8 @@ from google import genai
 from dotenv import load_dotenv
 import os
 from fastapi import FastAPI, HTTPException, Body, Query
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel, ValidationError
+from fastapi.responses import JSONResponse, StreamingResponse
+from pydantic import BaseModel, Field
 from typing import List, Optional
 import json
 import asyncio
@@ -16,20 +16,17 @@ from fastapi.middleware.cors import CORSMiddleware
 class FilesResponse(BaseModel):
     html: List[str]
     js: List[str]
+    css: List[str]
 
 class GeneratedCodeFile(BaseModel):
     name: str
     content: str
-
-class GenerateFilesRequest(BaseModel):
-    project_id: str
-    file_id: str
-    ui_prompt: str
+    description: str = Field(..., description="A brief, human-readable description of what this AI-generated code file does. This description should be easy for anyone to understand.")
 
 class PromptRequest(BaseModel):
-    prompt: str
-    file_id: str
     project_id: str
+    file_id: str
+    prompt: str
 
 # ---------------- Load env + app ----------------
 load_dotenv()
@@ -37,13 +34,10 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173"
-    ],
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"]
+    allow_headers=["*"],
 )
 
 # ---------------- Load prompts ----------------
@@ -51,134 +45,18 @@ try:
     with open("step_prompt.txt", "r") as f:
         steps_prompt = f.read()
 except FileNotFoundError as e:
-    print(f"Error: Prompt file not found - {e}. Please ensure step_prompt.txt and ui_prompt.txt exist.")
-    steps_prompt, ui_prompt = "", ""
+    print(f"Error: Prompt file not found - {e}. Please ensure step_prompt.txt exists.")
+    steps_prompt = ""
 
-# ---------------- Endpoints ----------------
-@app.post("/generate-initial")
-async def generate_initial_files(request: GenerateFilesRequest):
+# ---------------- Helper Functions ----------------
 
-    # Mongo client
-    mongo_client = MongoClient(os.environ["MONGODB_URI"])
-    db = mongo_client["ui_files"]
-    generated_files_coll = db["generated_files"]
-
-    try:
-        files_template = db["project_files"]
-        doc = files_template.find_one({"project_id": request.project_id, "file_id": request.file_id}, {"_id": 0, "files": 1})
-        if doc:
-            file_structure = doc["files"]
-            print(f"INFO: Fetched files for {request.project_id}, {request.file_id}", file_structure)
-
-    except Exception as e:
-        print(e)
-        raise HTTPException(status_code=404, detail="File or Project not found")
-
-    screen_specs = request.ui_prompt
-    with open("step_prompt.txt", "r") as f:
-        sys_ins = f.read()
-
-    api_key = os.environ.get("GEMINI_API_KEY")
-    if not api_key:
-        raise ValueError("GEMINI_API_KEY not found in environment variables.")
-
-    client = genai.Client(api_key=api_key)
-    chat = client.chats.create(model="gemini-2.5-pro")
-
-    # 1. Initial prompt
-    initial_prompt = f"""
-    First, carefully review this entire file architecture...
-    # RULES
-    {sys_ins}
-
-    # File architecture:
-    {json.dumps(file_structure, indent=2)}
-
-    # Screen specifications:
-    {screen_specs}
-    Acknowledge that you have understood the architecture.
+async def _create_file_template(request: PromptRequest, db) -> dict:
     """
-    print("Sending initial architecture context to Gemini...")
-    initial_response = chat.send_message(initial_prompt)
-    print("Gemini Acknowledged:", initial_response.text)
-
-    all_generated_files = []
-    process_order, batch_size = ["js", "html"], 8
-    all_batches_to_process = []
-
-    # Create batches
-    for category in process_order:
-        print("Process order", process_order)
-        if category in file_structure and file_structure[category]: # type: ignore
-            print("Inside IF")
-            file_names = file_structure[category] # type: ignore
-            for i in range(0, len(file_names), batch_size):
-                batch = file_names[i:i + batch_size]
-                all_batches_to_process.append({"category": category, "files": batch})
-
-    # Process each batch
-    for i, batch_info in enumerate(all_batches_to_process):
-        category, files_to_generate = batch_info["category"], batch_info["files"]
-        print(f"\nRequesting generation for '{category}' batch: {files_to_generate}")
-
-        generation_prompt = f"""
-        Generate the code for all files in this batch...
-        {json.dumps(files_to_generate)}
-        """
-
-        try:
-            response = chat.send_message(
-                generation_prompt,
-                config={
-                    "response_mime_type": "application/json",
-                    "response_schema": list[GeneratedCodeFile],
-                },
-            )
-            generated_batch_data: list[GeneratedCodeFile] = response.parsed # type: ignore
-
-            # Prepare Mongo docs
-            batch_documents = [
-                {
-                    "project_id": request.project_id,
-                    "file_id": request.file_id,
-                    "path": f.name,
-                    "file_type": category,
-                    "content": f.content,
-                    "created_at": datetime.now(timezone.utc),
-                }
-                for f in generated_batch_data
-            ]
-
-            if batch_documents:
-                result = generated_files_coll.insert_many(batch_documents)
-                print(f"Inserted {len(result.inserted_ids)} files into Mongo.")
-
-        except ValidationError as e:
-            print(f"Skipping invalid batch: {e}")
-            continue
-        except Exception as e:
-            print(f"FAILED during batch generation: {e}")
-            continue
-
-        if i < len(all_batches_to_process) - 1:
-            print("\nFinished processing batch. Waiting 60s before next batch...")
-            await asyncio.sleep(60)
-
-    return JSONResponse(
-        status_code=200,
-        content={"message": "Project generation completed."},
-    )
-
-@app.post("/template")
-def generate_template(request: PromptRequest):
+    Generates and saves the file structure template.
+    Returns the file_structure dictionary on success.
     """
-    Generates a file structure template based on a user prompt.
-    Response is validated against FilesResponse schema.
-    """
+    print("INFO: Attempting to generate file template.")
     client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
-    final_prompt = request.prompt
-
-    print("Sending Request to Gemini")
 
     response = client.models.generate_content(
         model="gemini-2.5-flash",
@@ -187,60 +65,188 @@ def generate_template(request: PromptRequest):
             response_schema=FilesResponse,
             response_mime_type="application/json",
         ),
-        contents=[final_prompt],
+        contents=[request.prompt],
     )
 
-    if response and response.candidates:
-        print("Request recieved from Gemini")
-        text = response.candidates[0].content.parts[0].text  # type: ignore
+    parsed_template = FilesResponse.model_validate_json(response.candidates[0].content.parts[0].text) # type: ignore
+
+    project_files_coll = db["project_files"]
+    project_file_template = {
+        "project_id": request.project_id,
+        "file_id": request.file_id,
+        "files": parsed_template.model_dump()
+    }
+    project_files_coll.insert_one(project_file_template)
+
+    print("INFO: File structure template created successfully.")
+    return parsed_template.model_dump()
+
+
+async def _generate_file_content_stream(request: PromptRequest, file_structure: dict, db):
+    """
+    An async generator that creates file content in batches and yields progress.
+    """
+    generated_files_coll = db["generated_files"]
+    client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+    chat = client.chats.create(model="gemini-2.5-flash")
+
+    # Set context for the chat model
+    initial_prompt = f"""
+    First, carefully review this entire file architecture...
+    # RULES
+    {steps_prompt}
+    # File architecture:
+    {json.dumps(file_structure, indent=2)}
+    # Screen specifications:
+    {request.prompt}
+    Acknowledge that you have understood the architecture.
+    """
+    chat.send_message(initial_prompt)
+    print("INFO: Gemini acknowledged and is ready to create the files.");
+
+    # Create and process batches
+    process_order, batch_size = ["js", "html", "css"], 8
+    all_batches_to_process = []
+
+    for category in process_order:
+        if category in file_structure and file_structure[category]:
+            file_names = file_structure[category]
+            for i in range(0, len(file_names), batch_size):
+                batch = file_names[i:i + batch_size]
+                all_batches_to_process.append({"category": category, "files": batch})
+
+    total_batches = len(all_batches_to_process)
+    for i, batch_info in enumerate(all_batches_to_process):
+        category, files_to_generate = batch_info["category"], batch_info["files"]
+
+        generation_prompt = f"Generate the code for all files in this batch... {json.dumps(files_to_generate)}"
+
         try:
-            parsed = FilesResponse.model_validate_json(text)  # type: ignore
-            with open("files.json", "w", encoding="utf-8") as f:
-                json.dump(parsed.model_dump(), f, indent=4)
+            yield json.dumps({
+                "status": "progress",
+                "message": f"Generating files... {i+1}/{total_batches}",
+                "files": files_to_generate
+            }) + "\n"
+            print(f"Generating files... {i+1}/{total_batches}",)
+            response = chat.send_message(
+                generation_prompt,
+                config={"response_mime_type": "application/json", "response_schema": list[GeneratedCodeFile]}
+            )
+            generated_batch_data: list[GeneratedCodeFile] = response.parsed # type: ignore
 
-            uri = os.environ.get("MONGODB_URI")
-            client = MongoClient(uri)
+            batch_documents = [
+                {
+                    "project_id": request.project_id, "file_id": request.file_id,
+                    "path": f.name, "file_type": category, "content": f.content,
+                    "created_at": datetime.now(timezone.utc),
+                } for f in generated_batch_data
+            ]
 
-            db = client["ui_files"]
+            if batch_documents:
+                generated_files_coll.insert_many(batch_documents)
+                files_info = [{"path": doc["path"], "file_type": doc["file_type"]} for doc in batch_documents]
+                yield json.dumps({
+                    "status": "progress",
+                    "message": f"Translating UX context into UI...{i+1}/{total_batches}.",
+                    "data": files_info
+                }) + "\n"
 
-            project_files = db["project_files"]
-
-            project_file_templates = {
-                "project_id": request.project_id,
-                "file_id": request.file_id,
-                "files": parsed.model_dump()
-            }
-
-            result = project_files.insert_one(project_file_templates)
-
-            print(f"File Templates written: {result.inserted_id}")
-
-            return JSONResponse(content=parsed.model_dump())
         except Exception as e:
-            return JSONResponse(status_code=500, content={"error": str(e), "raw": text})
+            print(f"FAILED during batch generation: {e}")
+            yield json.dumps({"status": "error", "message": f"Failed during batch generation for {files_to_generate}: {e}"}) + "\n"
+            continue
 
-    return JSONResponse(status_code=500, content={"message": "Failed to generate template from model."})
+        if i < len(all_batches_to_process) - 1:
+            yield json.dumps({"status": "waiting", "message": "Waiting 60s before next batch..."}) + "\n"
+            await asyncio.sleep(60)
+
+
+async def _generate_and_stream_files(request: PromptRequest):
+    mongo_client = MongoClient(os.environ["MONGODB_URI"])
+    db = mongo_client["ui_files"]
+    gen_files_coll = db["generated_files"]
+
+    # === Step 1: Generate Template ===
+    try:
+        yield json.dumps({"status": "starting", "message": "Generating files structure..."}) + "\n"
+        file_structure = await _create_file_template(request, db)
+        yield json.dumps({"status": "progress", "message": "Gathering UX context..."}) + "\n"
+    except Exception as e:
+        print(f"ERROR: Failed to generate template: {e}")
+        yield json.dumps({"status": "error", "message": f"Failed to generate files: {str(e)}"}) + "\n"
+        return
+
+    # === Step 2: Generate Content in batches ===
+    async for update in _generate_file_content_stream(request, file_structure, db):
+        yield update
+
+    # === Step 3: Fetch all generated files and return ===
+    all_files = list(gen_files_coll.find(
+        {"project_id": request.project_id, "file_id": request.file_id},
+        {"_id": 0, "created_at": 0}
+    ))
+    print("Project Generation Compelete")
+    yield json.dumps({
+        "status": "complete",
+        "message": "Project generation completed.",
+        "data": all_files
+    }) + "\n"
+
+# ---------------- Endpoints ----------------
+
+@app.post("/get-or-generate-files")
+async def get_or_generate_files(request: PromptRequest):
+    """
+    Checks if project files exist. If they do, returns them immediately.
+    If not, it starts the generation process and streams progress updates to the client.
+    """
+    mongo_client = MongoClient(os.environ["MONGODB_URI"])
+    db = mongo_client["ui_files"]
+    gen_files_coll = db["generated_files"]
+
+    # Check if files already exist
+    existing_files = list(gen_files_coll.find(
+        {"project_id": request.project_id, "file_id": request.file_id},
+        {"_id": 0, "created_at": 0}
+    ))
+
+    if existing_files:
+        print("INFO: Files already exist. Returning them.")
+        return JSONResponse(
+            status_code=200,
+            content={
+                "status": "complete",
+                "message": "Files already exist in DB.",
+                "data": existing_files
+            }
+        )
+    else:
+        print("INFO: Files not found. Starting generation and streaming response.")
+        return StreamingResponse(
+            _generate_and_stream_files(request),
+            media_type="application/x-ndjson"
+        )
 
 @app.get("/get-project-files")
 def get_project_files(project_id: str = Query(...), file_id: str = Query(...)):
-    uri = os.environ.get("MONGODB_URI")
-
-    client = MongoClient(uri)
-
-    db = client["ui_files"]
-    gen_files = db["generated_files"]
+    """
+    Get all the project's files.
+    """
+    mongo_client = MongoClient(os.environ.get("MONGODB_URI"))
+    db = mongo_client["ui_files"]
+    gen_files_coll = db["generated_files"]
 
     try:
-        docs = list(gen_files.find({"project_id": project_id, "file_id": file_id}, {"_id": 0, "created_at": 0}))
+        docs = list(gen_files_coll.find({"project_id": project_id, "file_id": file_id}, {"_id": 0, "created_at": 0}))
         if docs:
-            print(docs)
             return JSONResponse(status_code=200, content={"message": "Fetched files successfully", "data": docs})
         else:
-            print("ERROR: Fetching files")
-            return JSONResponse(status_code=500, content={"message": "Project or file not found"})
+            # It's better to return an empty list than a 500 error if nothing is found
+            return JSONResponse(status_code=200, content={"message": "No files found for this project", "data": []})
     except Exception as e:
-        print("ERROR: Fetching files", e)
-        return HTTPException(status_code=500, detail={"message": "Internal Server Error"})
+        print(f"ERROR: Fetching files: {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error while fetching files.")
+
 
 @app.get("/")
 def get_slash():

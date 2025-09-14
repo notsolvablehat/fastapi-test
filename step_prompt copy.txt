@@ -2,9 +2,9 @@
 
 I want to create a html css and js project. I want you to analyse screen_specifications and tell me a project structure. Respond with what files are needed to make this application fully function in the following format:
 
-{html: [html files' names with path], js: [js files' names with path]}
+{html: [html files' names with path], js: [js files' names with path], css: [css files' names with path]}
 - Each file should contain this:
-- first generated js files.
+- first generated js files. 
 
 - For routing, create a main.js file and link this in all the html files.
 
@@ -18,35 +18,14 @@ I want to create a html css and js project. I want you to analyse screen_specifi
 
 - if any updates are required to previously generated files, generate the complete file with new updates.
 
-## CSS INSTRUCTIONS:
-- In the head of every html file, use this as the css file: "./output.css"
-- Tailwindcss will be installed like the following:
-<tailwindcss_usage>
--> Install commands:
-npm install -D tailwindcss@3
-npx tailwindcss init
--> In tailwind.config.js:
- /** @type {import('tailwindcss').Config} */
-export default {
-   content: ["./src/**/*.{html,js}"],
-   theme: {
-     extend: {},
-   },
-   plugins: [],
- }
--> In ./input.css:
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
--> Final build:
-npx tailwindcss -i ./input.css -o ./output.css --minify
-</tailwindcss_usage>
+- Use a single global.css file for all the files. Do not create new files for css. Link this in html and generate all the styles related to the tags in this only. The name of the file must be `style.css` in the css folder.
+
 
 # IMPORTANT
 
 - Always create an entry point for the app to start. If there are more than single user for the application, you must route this using the login page.First generate index.html (entry point).
 
-- For login credentials, show them as the "info" in the login page itself. Both password and email/username.
+- For login credentials, show them as the "info" in the login page itself. Both password and email/username. 
 
 - Put the files in respective paths. Example: js/utils/.. or js/components/ or js/<user specific folder name>. This is optional but recommended.
 
