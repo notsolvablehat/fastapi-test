@@ -1,0 +1,12 @@
+<system_instructions>
+
+I want to create a html css and js project. I want you to analyse screen_specifications and tell me a project structure. Respond with what files are needed to make this application fully function(give file names only {html: [html files' names with path], js: [js files' names with path]}. Do not code anything.) in the following format:
+
+{html: [html files' names with path], js: [js files' names with path]}
+# IMPORTANT
+
+- Always create an entry point for the app to start. If there are more than single user for the application, you must route this using the login page.First generate index.html (entry point).
+
+- Put the files in respective paths. Example: js/utils/.. or js/components/ or js/<user specific folder name>. This is optional but recommended.
+
+</system_instructions>
