@@ -3,10 +3,11 @@ import requests
 
 # Payload for the request
 payload = {
-  "project_id": "test-project-v2-test1",
-  "file_id": "test-file-v2-test1",
+  "project_id": "test-project2-v3-test1",
+  "file_id": "test-file-v3-test1",
   "prompt": """
-## <font color="#E65B58">SYSTEM PROMPT</font>
+
+## <font color="#E65B58">SYSTEM PROMPT FOR UX</font>
 
 ### ROLE:
 You are a Expert UI generation assistant. Your task is to visually render a complete set of navigable and inter-linked screens from structured screen specifications, using platform-native components and design tokens already defined.
@@ -107,7 +108,7 @@ Different platforms have different **UI metaphors and animations** for transitio
 
 ---
 ## <font color="#529E72">USER PROMPT</font>
-I want to make a study planner for myself. I would strictlty follow it to study the college subjects and personal interest subjects. I also want this planner to include project timeline for my projects that are pending.
+I am making a dog healthcare mobile app to track my dog's vaccination records. I want alerting feature so that I don't miss on vaccinations and vet visits.
 
 <br>
 
@@ -116,286 +117,1071 @@ I want to make a study planner for myself. I would strictlty follow it to study 
 
 
 
-# Planning Dashboard
+# Screen: Home Screen
 
-### Purpose
-Provide a quick overview of upcoming academic and personal tasks, and offer access to core planning features.
-
-### Primary Features
-- Smart Deadline Balancer
-- Personal-Academic Balance Dashboard
-- Adaptive Task Breakdown Assistant
-
-### Navigation Elements
-- **Title:** `My Planner`
-- **Components:**
-  - Top Right Action Button
-  - Top App Bar
-  - Tab Bar
-  - Inline Contextual Action
-
-### Sections
-- Upcoming Deadlines
-- Your Balance Overview
-- Quick Actions
-
-### Component Placement Rules
-The Tab Bar is used for primary global navigation (Home, Schedule, Progress, Prioritization, Settings/Profile) as per iOS Human Interface Guidelines, fixed at the bottom. The Top App Bar displays the screen title 'My Planner' and includes a primary action button 'Add New Task' on the top right, aligning with iOS conventions for contextual actions. Inline contextual actions like 'View All Tasks' and 'Adjust Balance' are placed within their respective content sections to maintain context and reduce cognitive load for the user.
-
-### Linked Screens
-- Add Task/Project
-- My Schedule
-- Progress Tracking
-- Prioritization
-
-### Progressive Disclosure
-**Yes**
-
-### Text Styles
-- **Title:** Montserrat, Bold, Large
-- **Body:** Poppins, Regular, Medium
-- **CTA:** Montserrat, Semibold, Medium
-
-### Color Usage
-**Primary Color:**
-- Top App Bar background
-- Active Tab Bar icon/text
-- Primary CTA buttons (e.g., 'Add New Task' button background)
-- Section headers
-
-**Accent Color:**
-- Highlighting urgent deadlines
-- Progress indicators (e.g., balance wheel segments)
-- Interactive elements (e.g., 'View All Tasks' link, 'Adjust Balance' button text)
+The main purpose of this screen is to to provide an overview of upcoming and past vaccination schedules and vet appointments, allowing quick access to details and actions.
 
 ---
 
-# Add Task/Project
-
-### Purpose
-Allow users to input details for a new academic assignment or personal project, including name, description, category, deadline, and linked materials.
+## Key Features & Content Sections
 
 ### Primary Features
-- Study Material Connection Hub
-- Adaptive Task Breakdown Assistant
+* Smart Vaccination Timeline
+* Proactive Health Alert System
+* One-Tap Appointment Coordinator
 
-### Navigation Elements
-- **Title:** `Add New Task`
-- **Components:**
-  - Modal Sheet
-  - Inline Contextual Action
-  - System Back Button
-  - Top Right Action Button
-  - Swipe Gesture
-  - Top App Bar
-
-### Sections
-- Task Details
-- Scheduling
-- Materials
-- Breakdown
-
-### Component Placement Rules
-A Modal Sheet is used for adding a new task to provide a focused, temporary context, allowing users to easily dismiss without losing their place on the dashboard, aligning with iOS HIG for task-oriented flows. The Top App Bar within the modal contains 'Cancel' (top-left) and 'Save' (top-right) actions, which is standard for iOS modals. Inline contextual actions like 'Add Material' and 'Suggest Steps' are placed near their respective input fields for clear context. 'Confirm Schedule' is a prominent primary action button at the bottom of the form. A Swipe Gesture allows for quick dismissal of the modal, enhancing user efficiency.
-
-### Linked Screens
-- Planning Dashboard
-- My Schedule
-
-### Progressive Disclosure
-**Yes**
-
-### Text Styles
-- **Title:** Montserrat, Semibold, Large
-- **Body:** Poppins, Regular, Medium
-- **CTA:** Montserrat, Semibold, Medium
-
-### Color Usage
-**Primary Color:**
-- 'Save' button background
-- Input field borders (on focus)
-- Section titles
-
-**Accent Color:**
-- 'Add Material' icon
-- 'Suggest Steps' button text
-- Confirmation button (e.g., 'Confirm Schedule')
+### On-Screen Sections & Grouping Logic
+* **Upcoming Appointments**: Upcoming Appointments description not found.
+* **Vaccination Timeline**: Vaccination Timeline description not found.
+* **Quick Actions**: Quick Actions description not found.
 
 ---
 
-# My Schedule
+## Layout & Hierarchy
 
-### Purpose
-Display the user's structured weekly study schedule, integrating academic and personal projects on a unified timeline.
-
-### Primary Features
-- Smart Deadline Balancer
-- Study Material Connection Hub
-- Customizable Planning Templates
-
-### Navigation Elements
-- **Title:** `My Schedule`
-- **Components:**
-  - Top App Bar
-  - Top Right Action Button
-  - Swipe Gesture
-  - Inline Contextual Action
-  - Tab Bar
-
-### Sections
-- This Week
-- Next Week
-
-### Component Placement Rules
-The Tab Bar is used for global navigation to this screen. The Top App Bar displays the screen title and a 'Filter/View Options' button for customizing the schedule display, consistent with iOS design. Tasks on the timeline are interactive, allowing tap-to-view-details and drag-and-drop for prioritization, leveraging the 'Smart Deadline Balancer' design spec. A Swipe Gesture enables smooth navigation between different days or weeks on the schedule, enhancing usability and matching expected calendar interactions.
-
-### Linked Screens
-- Planning Dashboard
-- Progress Tracking
-- Prioritization
-- Task Detail Modal
-- Filter/View Options Modal
-
-### Progressive Disclosure
-**Yes**
-
-### Text Styles
-- **Title:** Montserrat, Bold, Large
-- **Body:** Poppins, Regular, Small/Medium
-- **CTA:** Montserrat, Semibold, Medium
-
-### Color Usage
-**Primary Color:**
-- Active tab bar icon/text
-- Calendar header/current day highlight
-- Primary task blocks (academic)
-
-**Accent Color:**
-- Personal project task blocks
-- Highlighting urgent tasks
-- Drag-drop indicators
-- Attachment icons
+* **Layout Type**: Collection_view.
+* **Hierarchy**: The current dog's name/profile picture will be prominent at the top. 'Upcoming Appointments' section will use larger text and accent color for due dates to draw immediate attention, reflecting Emily's anxiety over missed appointments. Timeline entries will use color-coding (e.g., green for completed, yellow for upcoming, red for overdue) for quick visual scanning. Interactive elements like 'Add Record' will be clearly distinguishable.
+* **Component Placement**: A top app bar will display the app title or dog's name, providing clear context. A top-right action button for 'Add Record' offers quick access to a frequent task. A bottom tab bar will be used for primary navigation between key sections: Home (Timeline), Health Records, Knowledge Hub, and possibly Profile/Settings. This follows iOS HIG for main navigation. Inline contextual actions (tapping a timeline event) are used to drill down into details, maintaining spatial sense.
+* **Progressive Disclosure**: This is **enabled**.
 
 ---
 
-# Progress Tracking
+## Navigation
 
-### Purpose
-Allow users to monitor and evaluate their progress on study tasks and projects, and visualize their academic-personal balance.
+### Navigation Logic
+Users arrive here after login. Can navigate to other main sections via the bottom tab bar. Tapping an upcoming appointment on the timeline pushes to 'View Upcoming Appointment Details Screen'. Tapping the 'Add Record' button pushes to 'Access Add Record Form'.
 
-### Primary Features
-- Focus Mode Time Tracker
-- Personal-Academic Balance Dashboard
-- Study Streak Motivator
+### User Clarity
+* **Where am I?**: On the Home screen, viewing your dog's vaccination timeline.
+* **What can I do?**: View upcoming appointments, check past vaccinations, manage reminders, and quickly add new records.
 
-### Navigation Elements
-- **Title:** `My Progress`
-- **Components:**
-  - Top App Bar
-  - Top Right Action Button
-  - Tab Bar
-  - Inline Contextual Action
+### Navigation Title
+*This screen's navigation bar title is **Paws Health**.*
 
-### Sections
-- Overall Balance
-- Study Streaks
-- Time Tracking Summary
+### Navigation Components
+* Top App Bar: ✅
+* Inline Contextual Action: ✅
+* Tab Bar: ✅
+* Top Right Action Button: ✅
 
-### Component Placement Rules
-The Tab Bar is used for global navigation to this screen. The Top App Bar displays the screen title and a 'Settings' button for customizing progress tracking preferences, aligning with iOS design principles. 'View Details' buttons are placed inline within each progress widget (e.g., balance wheel, streak calendar) to allow users to dive deeper into specific metrics, providing contextual access to information.
+### Defined User Actions
+* Add Record
+* Profile/Settings
+* View Details
+
+### Routes from this Screen
+* **Trigger**: User taps on an upcoming appointment card.
+    * **From**: `Home Screen (Upcoming Appointment Card)`
+    * **To**: `View Upcoming Appointment Details Screen`
+
+* **Trigger**: User taps 'Add Record' button in top app bar.
+    * **From**: `Home Screen (Add Record Button)`
+    * **To**: `Access Add Record Form`
+
+* **Trigger**: User taps 'Health Records' tab.
+    * **From**: `Home Screen (Tab Bar: Health Records)`
+    * **To**: `View Digital Health Passport`
+
+* **Trigger**: User taps 'Knowledge Hub' tab.
+    * **From**: `Home Screen (Tab Bar: Knowledge Hub)`
+    * **To**: `Browse Content Categories`
 
 ### Linked Screens
-- Planning Dashboard
-- My Schedule
-- Prioritization
-- Balance Detail Screen
-- Streak History Screen
-
-### Progressive Disclosure
-**Yes**
-
-### Text Styles
-- **Title:** Montserrat, Bold, Large
-- **Body:** Poppins, Regular, Medium
-- **CTA:** Montserrat, Semibold, Medium
-
-### Color Usage
-**Primary Color:**
-- Active tab bar icon/text
-- Section titles
-- Background of key progress cards
-
-**Accent Color:**
-- Balance wheel segments (personal projects)
-- Study streak highlights (confetti animation)
-- Progress bar fills
-- Call-to-action text for 'View Details'
+* View Upcoming Appointment Details Screen
+* View Digital Health Passport
+* Browse Content Categories
+* Access Add Record Form
 
 ---
 
-# Prioritization
+## Styling & Tone
 
-### Purpose
-Enable users to prioritize and re-organize tasks based on deadlines, importance, and available time using an interactive matrix and dynamic timeline.
-
-### Primary Features
-- Smart Deadline Balancer
-- Adaptive Task Breakdown Assistant
-
-### Navigation Elements
-- **Title:** `Prioritize Tasks`
-- **Components:**
-  - Top Right Action Button
-  - Tab Bar
-  - Inline Contextual Action
-  - Top App Bar
-
-### Sections
-- Urgent & Important
-- Important but Not Urgent
-- Urgent but Not Important
-- Neither Urgent Nor Important
-- Upcoming Deadlines
-
-### Component Placement Rules
-The Tab Bar is used for global navigation to this screen. The Top App Bar displays the screen title and a 'Sort/Filter' button to customize the task list, consistent with iOS design. Tasks within the priority matrix are interactive, supporting drag-and-drop for re-prioritization and tap-to-edit actions, leveraging the 'Smart Deadline Balancer' design spec. 'Confirm Changes' is a clear, prominent call to action button at the bottom of the screen.
-
-### Linked Screens
-- Planning Dashboard
-- My Schedule
-- Progress Tracking
-- Task Detail Modal
-
-### Progressive Disclosure
-**Yes**
-
-### Text Styles
-- **Title:** Montserrat, Bold, Large
-- **Body:** Poppins, Regular, Medium
-- **CTA:** Montserrat, Semibold, Medium
+### Typography
+* **Primary Font**: Poppins
+* **Secondary Font**: Montserrat
+* **Text Styles**:
+    * **Title**: Montserrat, Bold, Large
+    * **Body**: Poppins, Regular, Medium
+    * **CTA**: Poppins, Semi-bold, Medium, White text on Forest Green background
 
 ### Color Usage
-**Primary Color:**
-- Active tab bar icon/text
-- Quadrant borders/backgrounds (for high priority sections)
-- Confirm Changes button
+* **Primary Color Usage**:
+    * App title
+    * active tab bar icon/label (Home)
+    * primary CTAs (e.g., 'Add Record' button background)
+* **Accent Color Usage**:
+    * Urgency indicators on timeline
+    * notification badges
+    * subtle animations for completed tasks
 
-**Accent Color:**
-- Highlighting urgent tasks within quadrants
-- Drag-drop indicators
-- Warning indicators for approaching deadlines
+### Tone & Persona
+* **Emotional Goals**: The screen should feel **alleviate anxiety, provide control, build assurance, promote efficiency.**.
+* **Persona Notes**: Use clear, concise, and supportive language. Emphasize proactive management. For example, 'Your pet's health, simplified.' or 'Stay on track with Buddy's vaccinations.'
+
+---
+
+# Screen: View Upcoming Appointment Details Screen
+
+The main purpose of this screen is to to provide detailed information about a specific upcoming vaccination or vet appointment and allow the user to take actions.
+
+---
+
+## Key Features & Content Sections
+
+### Primary Features
+* Smart Vaccination Timeline
+* Proactive Health Alert System
+* One-Tap Appointment Coordinator
+
+### On-Screen Sections & Grouping Logic
+* **Appointment Information**: Appointment Information description not found.
+* **Actions**: Actions description not found.
+
+---
+
+## Layout & Hierarchy
+
+* **Layout Type**: List.
+* **Hierarchy**: Appointment name and date will be most prominent. Key actions like 'Acknowledge' will be primary CTAs using the primary color. Information will be presented in a clear, legible list format with appropriate spacing.
+* **Component Placement**: A top app bar with a clear title and a back button (system back arrow) allows users to easily return to the Home screen. Primary actions like 'Add to Calendar', 'Reschedule', 'Acknowledge', and 'Snooze' are placed inline as prominent buttons, reflecting their importance for Emily's busy schedule. Less frequent actions like 'Cancel Appointment' are placed in an overflow menu to avoid clutter. Swipe gesture for back navigation provides a native iOS experience.
+* **Progressive Disclosure**: This is **disabled**.
+
+---
+
+## Navigation
+
+### Navigation Logic
+Users navigate here by tapping an upcoming appointment on the 'Home Screen'. Returns to 'Home Screen' via back button/gesture or after acknowledging/snoozing. 'Add to Calendar' triggers native calendar integration. 'Reschedule' would push to a new screen for selecting a new date/time.
+
+### User Clarity
+* **Where am I?**: On the Appointment Details screen for [Appointment Name].
+* **What can I do?**: View appointment specifics, add to calendar, reschedule, or acknowledge this reminder.
+
+### Navigation Title
+*This screen's navigation bar title is **Appointment Details**.*
+
+### Navigation Components
+* Top App Bar: ✅
+* System Back Button: ✅
+* Overflow Menu: ✅
+* Swipe Gesture: ✅
+* Inline Contextual Action: ✅
+
+### Defined User Actions
+* Add to Calendar
+* Reschedule
+* Acknowledge
+* Snooze
+* Cancel Appointment
+
+### Routes from this Screen
+* **Trigger**: User taps back button or swipes back.
+    * **From**: `View Upcoming Appointment Details Screen (Back Button/Gesture)`
+    * **To**: `Home Screen`
+
+* **Trigger**: User taps 'Add to Calendar'.
+    * **From**: `View Upcoming Appointment Details Screen (Add to Calendar Button)`
+    * **To**: `Native Calendar App`
+
+* **Trigger**: User taps 'Reschedule'.
+    * **From**: `View Upcoming Appointment Details Screen (Reschedule Button)`
+    * **To**: `Reschedule Appointment Screen`
+
+* **Trigger**: User taps 'Acknowledge'.
+    * **From**: `View Upcoming Appointment Details Screen (Acknowledge Button)`
+    * **To**: `Home Screen`
+
+* **Trigger**: User taps 'Snooze'.
+    * **From**: `View Upcoming Appointment Details Screen (Snooze Button)`
+    * **To**: `Home Screen`
+
+### Linked Screens
+* Home Screen
+* Reschedule Appointment Screen
+* Confirmation Screen
+
+---
+
+## Styling & Tone
+
+### Typography
+* **Primary Font**: Poppins
+* **Secondary Font**: Montserrat
+* **Text Styles**:
+    * **Title**: Montserrat, Bold, Large
+    * **Body**: Poppins, Regular, Medium
+    * **CTA**: Poppins, Semi-bold, Medium, White text on Forest Green background
+
+### Color Usage
+* **Primary Color Usage**:
+    * Action buttons ('Acknowledge', 'Add to Calendar')
+    * navigation title
+* **Accent Color Usage**:
+    * Highlighting important dates/times
+    * status indicators
+    * subtle confirmation animations
+
+### Tone & Persona
+* **Emotional Goals**: The screen should feel **provide clear information, facilitate quick action, reduce anxiety about managing appointments.**.
+* **Persona Notes**: Use direct, reassuring language. 'Your appointment for [Vaccine Name] is set.' 'Add to your calendar with one tap.'
+
+---
+
+# Screen: View Digital Health Passport
+
+The main purpose of this screen is to to provide a secure, comprehensive overview of the dog's vaccination and health records, allowing easy access and verification.
+
+---
+
+## Key Features & Content Sections
+
+### Primary Features
+* Vaccination Record Vault
+* Trust-Building Verification System
+
+### On-Screen Sections & Grouping Logic
+* **Current Pet: [Dog's Name]**: Current Pet: [Dog's Name] description not found.
+* **Vaccination History**: Vaccination History description not found.
+* **Other Health Records**: Other Health Records description not found.
+
+---
+
+## Layout & Hierarchy
+
+* **Layout Type**: List.
+* **Hierarchy**: The dog's name and a summary of their vaccination status (e.g., 'All up-to-date' or '1 overdue') will be at the top, using larger text. Each record entry in the list will clearly display the vaccination name, date, and a verification badge. Overdue records will be highlighted with the accent color. The 'Add Record' button will be prominent.
+* **Component Placement**: A top app bar with the screen title and a prominent 'Add Record' button (or 'Share' icon) on the right for quick access to key functionalities. The bottom tab bar will include 'Health Records' as a primary navigation destination. Tapping on individual record entries uses inline contextual action to push to the 'View Vaccination Detail Screen'.
+* **Progressive Disclosure**: This is **enabled**.
+
+---
+
+## Navigation
+
+### Navigation Logic
+Users navigate here via the bottom tab bar from any main screen. Tapping on a specific vaccination entry pushes to 'View Vaccination Detail Screen'. Tapping 'Add Record' pushes to 'Access Add Record Form'. 'Share' action would open a share sheet (modal).
+
+### User Clarity
+* **Where am I?**: On the Digital Health Passport screen for [Dog's Name].
+* **What can I do?**: View all vaccination records, check health history, share records, or add new entries.
+
+### Navigation Title
+*This screen's navigation bar title is **Health Passport**.*
+
+### Navigation Components
+* Inline Contextual Action: ✅
+* Tab Bar: ✅
+* Top Right Action Button: ✅
+* Top App Bar: ✅
+
+### Defined User Actions
+* Add Record
+* Share
+* View Details
+
+### Routes from this Screen
+* **Trigger**: User taps on a specific vaccination record entry.
+    * **From**: `View Digital Health Passport (Vaccination Entry)`
+    * **To**: `View Vaccination Detail Screen`
+
+* **Trigger**: User taps 'Add Record' button in top app bar.
+    * **From**: `View Digital Health Passport (Add Record Button)`
+    * **To**: `Access Add Record Form`
+
+* **Trigger**: User taps 'Share' icon.
+    * **From**: `View Digital Health Passport (Share Button)`
+    * **To**: `Share Sheet`
+
+* **Trigger**: User taps 'Home' tab.
+    * **From**: `View Digital Health Passport (Tab Bar: Home)`
+    * **To**: `Home Screen`
+
+* **Trigger**: User taps 'Knowledge Hub' tab.
+    * **From**: `View Digital Health Passport (Tab Bar: Knowledge Hub)`
+    * **To**: `Browse Content Categories`
+
+### Linked Screens
+* Home Screen
+* Browse Content Categories
+* View Vaccination Detail Screen
+* Access Add Record Form
+* Share Sheet
+
+---
+
+## Styling & Tone
+
+### Typography
+* **Primary Font**: Poppins
+* **Secondary Font**: Montserrat
+* **Text Styles**:
+    * **Title**: Montserrat, Bold, Large
+    * **Body**: Poppins, Regular, Medium
+    * **CTA**: Poppins, Semi-bold, Medium, White text on Forest Green background
+
+### Color Usage
+* **Primary Color Usage**:
+    * Active tab bar icon/label (Health Records)
+    * 'Add Record' button background
+    * verification badges
+* **Accent Color Usage**:
+    * Highlighting overdue records
+    * 'Share' icon
+    * subtle lock/unlock animations for security
+
+### Tone & Persona
+* **Emotional Goals**: The screen should feel **build trust and confidence in record-keeping, provide a sense of safety and control over pet's health.**.
+* **Persona Notes**: Use reassuring and professional language. 'Your pet's health records, always secure and accessible.' 'Verified for your peace of mind.'
+
+---
+
+# Screen: View Vaccination Detail Screen
+
+The main purpose of this screen is to to display comprehensive details of a single vaccination record and offer options to share or edit it.
+
+---
+
+## Key Features & Content Sections
+
+### Primary Features
+* Vaccination Record Vault
+* Trust-Building Verification System
+
+### On-Screen Sections & Grouping Logic
+* **Vaccination Details**: Vaccination Details description not found.
+* **Proof of Vaccination**: Proof of Vaccination description not found.
+
+---
+
+## Layout & Hierarchy
+
+* **Layout Type**: List.
+* **Hierarchy**: Vaccination name will be the most prominent heading. Key details (date, vet) will use slightly larger/bolder text than other notes. The 'View Proof' button/link will be clearly visible if a document is present.
+* **Component Placement**: A top app bar with a clear title and a back button for easy navigation back to the Health Passport. 'Share' and 'Edit' actions are placed in the top right for quick access, as these are common actions for a specific record. 'View Proof' is an inline action, appearing only if a document is attached. Swipe gesture for back navigation.
+* **Progressive Disclosure**: This is **disabled**.
+
+---
+
+## Navigation
+
+### Navigation Logic
+Users navigate here by tapping a specific vaccination entry on the 'View Digital Health Passport' screen. Returns to 'View Digital Health Passport' via back button/gesture. 'Share' opens a native share sheet. 'Edit' pushes to an edit form (similar to 'Access Add Record Form').
+
+### User Clarity
+* **Where am I?**: On the Vaccination Detail screen for [Vaccination Name].
+* **What can I do?**: Review vaccination details, view proof document, share this record, or edit information.
+
+### Navigation Title
+*This screen's navigation bar title is **Vaccination Details**.*
+
+### Navigation Components
+* System Back Button: ✅
+* Swipe Gesture: ✅
+* Top App Bar: ✅
+* Top Right Action Button: ✅
+* Inline Contextual Action: ✅
+
+### Defined User Actions
+* Share
+* Edit
+* View Proof
+
+### Routes from this Screen
+* **Trigger**: User taps back button or swipes back.
+    * **From**: `View Vaccination Detail Screen (Back Button/Gesture)`
+    * **To**: `View Digital Health Passport`
+
+* **Trigger**: User taps 'Share' icon.
+    * **From**: `View Vaccination Detail Screen (Share Button)`
+    * **To**: `Share Sheet`
+
+* **Trigger**: User taps 'Edit' icon.
+    * **From**: `View Vaccination Detail Screen (Edit Button)`
+    * **To**: `Edit Vaccination Record Form`
+
+* **Trigger**: User taps 'View Proof' link/button.
+    * **From**: `View Vaccination Detail Screen (View Proof)`
+    * **To**: `Document Viewer`
+
+### Linked Screens
+* View Digital Health Passport
+* Edit Vaccination Record Form
+* Share Sheet
+
+---
+
+## Styling & Tone
+
+### Typography
+* **Primary Font**: Poppins
+* **Secondary Font**: Montserrat
+* **Text Styles**:
+    * **Title**: Montserrat, Bold, Large
+    * **Body**: Poppins, Regular, Medium
+    * **CTA**: Poppins, Semi-bold, Medium, White text on Forest Green background
+
+### Color Usage
+* **Primary Color Usage**:
+    * Navigation title
+    * 'Edit' icon
+    * 'Share' icon
+* **Accent Color Usage**:
+    * Verification badges
+    * highlighting key data points like next due date (if applicable)
+
+### Tone & Persona
+* **Emotional Goals**: The screen should feel **reinforce trust in data accuracy, provide a sense of control over information.**.
+* **Persona Notes**: Factual and clear. 'Verified record for [Vaccination Name].' 'Easily share or update this record.'
+
+---
+
+# Screen: Access Add Record Form
+
+The main purpose of this screen is to to allow users to easily and accurately input details for a new vaccination record.
+
+---
+
+## Key Features & Content Sections
+
+### Primary Features
+* Vaccination Record Vault
+
+### On-Screen Sections & Grouping Logic
+* **Vaccination Details**: Vaccination Details description not found.
+* **Proof (Optional)**: Proof (Optional) description not found.
+
+---
+
+## Layout & Hierarchy
+
+* **Layout Type**: List.
+* **Hierarchy**: Form fields will have clear labels and input areas. The 'Save' button will be a prominent CTA using the primary color. Auto-complete suggestions for vaccine names will be visually distinct.
+* **Component Placement**: A top app bar with a clear title and a back button. A 'Save' button in the top right (or as a primary button at the bottom) provides a clear action to complete the form. Input fields are presented in a clear list format. 'Attach Document' is an inline action within the form. Swipe gesture for back navigation, potentially with a warning for unsaved data.
+* **Progressive Disclosure**: This is **disabled**.
+
+---
+
+## Navigation
+
+### Navigation Logic
+Users navigate here by tapping 'Add Record' from 'Home Screen' or 'View Digital Health Passport'. 'Save' (or 'Next') pushes to 'Review and Confirm' screen. Back button/gesture or 'Cancel' returns to the previous screen, potentially with a discard warning.
+
+### User Clarity
+* **Where am I?**: On the Add New Vaccination Record screen.
+* **What can I do?**: Enter vaccination details, attach proof, and save the new record.
+
+### Navigation Title
+*This screen's navigation bar title is **Add New Record**.*
+
+### Navigation Components
+* Top App Bar: ✅
+* Inline Contextual Action: ✅
+* System Back Button: ✅
+* Top Right Action Button: ✅
+* Swipe Gesture: ✅
+
+### Defined User Actions
+* Save
+* Cancel
+* Attach Document
+
+### Routes from this Screen
+* **Trigger**: User taps back button or swipes back (with discard warning).
+    * **From**: `Access Add Record Form (Back Button/Gesture)`
+    * **To**: `View Digital Health Passport`
+
+* **Trigger**: User taps 'Save' or 'Next' button.
+    * **From**: `Access Add Record Form (Save/Next Button)`
+    * **To**: `Review and Confirm`
+
+### Linked Screens
+* View Digital Health Passport
+* Review and Confirm
+
+---
+
+## Styling & Tone
+
+### Typography
+* **Primary Font**: Poppins
+* **Secondary Font**: Montserrat
+* **Text Styles**:
+    * **Title**: Montserrat, Bold, Large
+    * **Body**: Poppins, Regular, Medium
+    * **CTA**: Poppins, Semi-bold, Medium, White text on Forest Green background
+
+### Color Usage
+* **Primary Color Usage**:
+    * Navigation title
+    * 'Save' button background
+* **Accent Color Usage**:
+    * Input field borders when active
+    * 'Attach Document' icon
+
+### Tone & Persona
+* **Emotional Goals**: The screen should feel **reduce cognitive load, provide a sense of efficiency and accuracy in data entry.**.
+* **Persona Notes**: Use clear, instructional language. 'Enter details for [Dog's Name]'s new vaccination.' 'Quickly add records to keep everything up-to-date.'
+
+---
+
+# Screen: Review and Confirm
+
+The main purpose of this screen is to to allow the user to review all entered vaccination details before final submission, ensuring accuracy.
+
+---
+
+## Key Features & Content Sections
+
+### Primary Features
+* Vaccination Record Vault
+
+### On-Screen Sections & Grouping Logic
+* **Vaccination Details**: Vaccination Details description not found.
+* **Veterinary Information**: Veterinary Information description not found.
+* **Attached Documents**: Attached Documents description not found.
+
+---
+
+## Layout & Hierarchy
+
+* **Layout Type**: List.
+* **Hierarchy**: The screen title and 'Confirm & Save' button will be prominent. Each detail will be clearly labeled, with the entered value in a slightly bolder font. 'Edit' actions will be subtle but clear.
+* **Component Placement**: A top app bar with a clear title and a back button to allow users to go back and edit the form. A prominent 'Confirm & Save' button at the bottom of the screen to finalize the action. Small 'Edit' buttons or icons next to each section of details allow for quick adjustments, as per UX tip. Swipe gesture for back navigation.
+* **Progressive Disclosure**: This is **disabled**.
+
+---
+
+## Navigation
+
+### Navigation Logic
+Users navigate here from 'Access Add Record Form' after entering details. Tapping 'Confirm & Save' pushes to 'Receive Record Confirmation'. Back button/gesture or 'Edit' returns to 'Access Add Record Form'.
+
+### User Clarity
+* **Where am I?**: On the Review and Confirm screen for the new vaccination record.
+* **What can I do?**: Review all details, make quick edits, or confirm and save the record.
+
+### Navigation Title
+*This screen's navigation bar title is **Review & Confirm**.*
+
+### Navigation Components
+* Inline Contextual Action: ✅
+* Swipe Gesture: ✅
+* System Back Button: ✅
+* Top App Bar: ✅
+
+### Defined User Actions
+* Confirm & Save
+* Edit
+
+### Routes from this Screen
+* **Trigger**: User taps back button or swipes back.
+    * **From**: `Review and Confirm (Back Button/Gesture)`
+    * **To**: `Access Add Record Form`
+
+* **Trigger**: User taps 'Edit' button next to a section.
+    * **From**: `Review and Confirm (Edit Button)`
+    * **To**: `Access Add Record Form`
+
+* **Trigger**: User taps 'Confirm & Save' button.
+    * **From**: `Review and Confirm (Confirm & Save Button)`
+    * **To**: `Receive Record Confirmation`
+
+### Linked Screens
+* Access Add Record Form
+* Receive Record Confirmation
+
+---
+
+## Styling & Tone
+
+### Typography
+* **Primary Font**: Poppins
+* **Secondary Font**: Montserrat
+* **Text Styles**:
+    * **Title**: Montserrat, Bold, Large
+    * **Body**: Poppins, Regular, Medium
+    * **CTA**: Poppins, Semi-bold, Medium, White text on Forest Green background
+
+### Color Usage
+* **Primary Color Usage**:
+    * Navigation title
+    * 'Confirm & Save' button background
+* **Accent Color Usage**:
+    * Small 'Edit' icons/text
+    * highlighting any critical warnings if data is incomplete
+
+### Tone & Persona
+* **Emotional Goals**: The screen should feel **provide a sense of control and finality, build confidence in the accuracy of the record.**.
+* **Persona Notes**: Clear, reassuring, and action-oriented. 'Please review your entry before saving.' 'Your record will be securely added.'
+
+---
+
+# Screen: Receive Record Confirmation
+
+The main purpose of this screen is to to confirm to the user that their new vaccination record has been successfully added and provide clear next steps.
+
+---
+
+## Key Features & Content Sections
+
+### Primary Features
+* Vaccination Record Vault
+* Trust-Building Verification System
+
+---
+
+## Layout & Hierarchy
+
+* **Layout Type**: Collection_view.
+* **Hierarchy**: A large, central success message (e.g., 'Record Added!') with a celebratory animation will dominate the screen. The primary CTA 'Go to Health Passport' will be visually most prominent. Subtle text reinforcing security and trust will be included.
+* **Component Placement**: A top app bar with a celebratory title. No back button, as this is a confirmation screen; the user should be guided to next actions. Prominent inline buttons offer clear next steps: 'Go to Health Passport' as the primary action, and 'View Record' as a secondary option.
+* **Progressive Disclosure**: This is **disabled**.
+
+---
+
+## Navigation
+
+### Navigation Logic
+Users navigate here from 'Review and Confirm' after successful submission. 'Go to Health Passport' navigates to 'View Digital Health Passport' (replacing the stack). 'View Record' navigates to 'View Vaccination Detail Screen' for the newly added record.
+
+### User Clarity
+* **Where am I?**: On the Record Confirmation screen.
+* **What can I do?**: View the newly added record, return to health passport, or continue managing records.
+
+### Navigation Title
+*This screen's navigation bar title is **Record Added!**.*
+
+### Navigation Components
+* Inline Contextual Action: ✅
+* Top App Bar: ✅
+
+### Defined User Actions
+* View Record
+* Go to Health Passport
+
+### Routes from this Screen
+* **Trigger**: User taps 'Go to Health Passport' button.
+    * **From**: `Receive Record Confirmation (Go to Health Passport Button)`
+    * **To**: `View Digital Health Passport`
+
+* **Trigger**: User taps 'View Record' button.
+    * **From**: `Receive Record Confirmation (View Record Button)`
+    * **To**: `View Vaccination Detail Screen`
+
+### Linked Screens
+* View Digital Health Passport
+* View Vaccination Detail Screen
+
+---
+
+## Styling & Tone
+
+### Typography
+* **Primary Font**: Poppins
+* **Secondary Font**: Montserrat
+* **Text Styles**:
+    * **Title**: Montserrat, Extra Bold, Very Large
+    * **Body**: Poppins, Regular, Medium
+    * **CTA**: Poppins, Semi-bold, Medium, White text on Forest Green background
+
+### Color Usage
+* **Primary Color Usage**:
+    * Navigation title
+    * 'Go to Health Passport' button background
+* **Accent Color Usage**:
+    * Confirmation animation (e.g., checkmark)
+    * 'View Record' button text
+
+### Tone & Persona
+* **Emotional Goals**: The screen should feel **provide a sense of relief and accomplishment, reinforce trust and reliability.**.
+* **Persona Notes**: Positive, encouraging, and clear about the next steps. 'Great job, Emily! [Dog's Name]'s record is now updated.' 'You're doing a fantastic job keeping your pet healthy.'
+
+---
+
+# Screen: Browse Content Categories
+
+The main purpose of this screen is to to allow users to explore veterinarian-verified educational content categorized for easy discovery.
+
+---
+
+## Key Features & Content Sections
+
+### Primary Features
+* Vet-Verified Knowledge Hub
+
+### On-Screen Sections & Grouping Logic
+* **Explore Topics**: Explore Topics description not found.
+* **Get Personalized Advice**: Get Personalized Advice description not found.
+
+---
+
+## Layout & Hierarchy
+
+* **Layout Type**: Grid.
+* **Hierarchy**: Category cards will use images and clear titles, with trust badges to emphasize vet verification. The 'Get Personalized Advice' section will be visually distinct and prominent, possibly using a larger card or a primary CTA. Titles will use the secondary font for emphasis.
+* **Component Placement**: A top app bar with a clear title. A search icon in the top right allows users to quickly find specific topics. The bottom tab bar will include 'Knowledge Hub' as a primary navigation destination. Category cards are interactive, leading to content. A dedicated card/button for 'Vaccination Decision Assistant' is prominent.
+* **Progressive Disclosure**: This is **enabled**.
+
+---
+
+## Navigation
+
+### Navigation Logic
+Users navigate here via the bottom tab bar from any main screen. Tapping a category card pushes to 'View Educational Articles/Videos'. Tapping 'Access Decision Assistant' pushes to 'Input Dog's Profile Details'.
+
+### User Clarity
+* **Where am I?**: On the Knowledge Hub screen, browsing educational categories.
+* **What can I do?**: Select a category to learn more about vaccinations and dog health, or access personalized advice.
+
+### Navigation Title
+*This screen's navigation bar title is **Knowledge Hub**.*
+
+### Navigation Components
+* Tab Bar: ✅
+* Inline Contextual Action: ✅
+* Top App Bar: ✅
+* Top Right Action Button: ✅
+
+### Defined User Actions
+* Search
+* Access Decision Assistant
+
+### Routes from this Screen
+* **Trigger**: User taps on an educational content category card.
+    * **From**: `Browse Content Categories (Category Card)`
+    * **To**: `View Educational Articles/Videos`
+
+* **Trigger**: User taps 'Access Decision Assistant' button.
+    * **From**: `Browse Content Categories (Access Decision Assistant Button)`
+    * **To**: `Input Dog's Profile Details`
+
+* **Trigger**: User taps 'Search' icon in top app bar.
+    * **From**: `Browse Content Categories (Search Icon)`
+    * **To**: `Search Results Screen`
+
+* **Trigger**: User taps 'Home' tab.
+    * **From**: `Browse Content Categories (Tab Bar: Home)`
+    * **To**: `Home Screen`
+
+* **Trigger**: User taps 'Health Records' tab.
+    * **From**: `Browse Content Categories (Tab Bar: Health Records)`
+    * **To**: `View Digital Health Passport`
+
+### Linked Screens
+* Home Screen
+* View Digital Health Passport
+* View Educational Articles/Videos
+* Input Dog's Profile Details
+* Search Results Screen
+
+---
+
+## Styling & Tone
+
+### Typography
+* **Primary Font**: Poppins
+* **Secondary Font**: Montserrat
+* **Text Styles**:
+    * **Title**: Montserrat, Bold, Large
+    * **Body**: Poppins, Regular, Medium
+    * **CTA**: Poppins, Semi-bold, Medium, White text on Forest Green background
+
+### Color Usage
+* **Primary Color Usage**:
+    * Active tab bar icon/label (Knowledge Hub)
+    * 'Access Decision Assistant' button background
+* **Accent Color Usage**:
+    * Trust badges on category cards
+    * subtle pulse animation for new content
+
+### Tone & Persona
+* **Emotional Goals**: The screen should feel **empower users with knowledge, build trust in information, reduce uncertainty.**.
+* **Persona Notes**: Informative, authoritative yet approachable. 'Learn more about your dog's health.' 'Expert advice at your fingertips.'
+
+---
+
+# Screen: View Educational Articles/Videos
+
+The main purpose of this screen is to to present detailed, veterinarian-verified educational content (articles or videos) in an engaging and easily digestible format.
+
+---
+
+## Key Features & Content Sections
+
+### Primary Features
+* Vet-Verified Knowledge Hub
+* Visual Vaccination Explainer
+
+---
+
+## Layout & Hierarchy
+
+* **Layout Type**: List.
+* **Hierarchy**: Article title will be prominent. Headings within the article will use the secondary font for structure. Images/videos will be appropriately sized and placed for readability. 'Vet-Verified' badge will be clearly visible.
+* **Component Placement**: A top app bar with the article title and a back button to return to 'Browse Content Categories'. 'Share' and 'Save for Offline' actions are placed in the top right for easy access. Inline actions for content rating and feedback loop. Swipe gesture for back navigation.
+* **Progressive Disclosure**: This is **enabled**.
+
+---
+
+## Navigation
+
+### Navigation Logic
+Users navigate here by tapping a content card on 'Browse Content Categories'. Returns to 'Browse Content Categories' via back button/gesture. 'Share' opens a native share sheet.
+
+### User Clarity
+* **Where am I?**: On the educational content screen: '[Article/Video Title]'.
+* **What can I do?**: Read the article, watch the video, save for later, or provide feedback.
+
+### Navigation Title
+*This screen's navigation bar title is **[Article/Video Title]**.*
+
+### Navigation Components
+* Swipe Gesture: ✅
+* System Back Button: ✅
+* Top Right Action Button: ✅
+* Top App Bar: ✅
+* Inline Contextual Action: ✅
+
+### Defined User Actions
+* Share
+* Save for Offline
+* Rate Content
+
+### Routes from this Screen
+* **Trigger**: User taps back button or swipes back.
+    * **From**: `View Educational Articles/Videos (Back Button/Gesture)`
+    * **To**: `Browse Content Categories`
+
+* **Trigger**: User taps 'Share' icon.
+    * **From**: `View Educational Articles/Videos (Share Button)`
+    * **To**: `Share Sheet`
+
+* **Trigger**: User taps to expand an infographic.
+    * **From**: `View Educational Articles/Videos (Interactive Infographic)`
+    * **To**: `Expanded Infographic View`
+
+### Linked Screens
+* Browse Content Categories
+* Share Sheet
+
+---
+
+## Styling & Tone
+
+### Typography
+* **Primary Font**: Poppins
+* **Secondary Font**: Montserrat
+* **Text Styles**:
+    * **Title**: Montserrat, Bold, Large
+    * **Body**: Poppins, Regular, Medium
+    * **CTA**: Poppins, Semi-bold, Medium, White text on Forest Green background
+
+### Color Usage
+* **Primary Color Usage**:
+    * Navigation title
+    * 'Save for Offline' toggle/icon
+    * 'Share' icon
+* **Accent Color Usage**:
+    * Highlighting key terms
+    * interactive elements in infographics
+    * content rating stars
+
+### Tone & Persona
+* **Emotional Goals**: The screen should feel **empower users with clear, reliable information, build confidence in decision-making.**.
+* **Persona Notes**: Educational, clear, and reassuring. 'Understanding [Topic Name].' 'Backed by veterinary experts.'
+
+---
+
+# Screen: Input Dog's Profile Details
+
+The main purpose of this screen is to to collect specific details about the user's dog to provide personalized vaccination recommendations.
+
+---
+
+## Key Features & Content Sections
+
+### Primary Features
+* Vet-Verified Knowledge Hub
+
+### On-Screen Sections & Grouping Logic
+* **Your Dog's Profile**: Your Dog's Profile description not found.
+* **Lifestyle & Location**: Lifestyle & Location description not found.
+
+---
+
+## Layout & Hierarchy
+
+* **Layout Type**: List.
+* **Hierarchy**: Clear labels for each input field. The 'Get Recommendations' button will be the primary CTA. The 'Auto-fill' option will be visually distinct but secondary.
+* **Component Placement**: A top app bar with a clear title and a back button to return to 'Browse Content Categories'. A prominent 'Get Recommendations' button at the bottom to proceed. An 'Auto-fill from Profile' option is placed inline near the input fields to save user effort. Swipe gesture for back navigation.
+* **Progressive Disclosure**: This is **disabled**.
+
+---
+
+## Navigation
+
+### Navigation Logic
+Users navigate here by tapping 'Engage with Decision Assistant' from 'Browse Content Categories'. 'Get Recommendations' pushes to 'Receive Personalized Insights'. Back button/gesture returns to 'Browse Content Categories'.
+
+### User Clarity
+* **Where am I?**: On the Vaccination Decision Assistant setup screen.
+* **What can I do?**: Enter your dog's details to get personalized vaccination advice.
+
+### Navigation Title
+*This screen's navigation bar title is **Decision Assistant**.*
+
+### Navigation Components
+* Top App Bar: ✅
+* Swipe Gesture: ✅
+* System Back Button: ✅
+* Inline Contextual Action: ✅
+
+### Defined User Actions
+* Get Recommendations
+* Auto-fill from Profile
+
+### Routes from this Screen
+* **Trigger**: User taps back button or swipes back.
+    * **From**: `Input Dog's Profile Details (Back Button/Gesture)`
+    * **To**: `Browse Content Categories`
+
+* **Trigger**: User taps 'Get Recommendations' button.
+    * **From**: `Input Dog's Profile Details (Get Recommendations Button)`
+    * **To**: `Receive Personalized Insights`
+
+### Linked Screens
+* Browse Content Categories
+* Receive Personalized Insights
+
+---
+
+## Styling & Tone
+
+### Typography
+* **Primary Font**: Poppins
+* **Secondary Font**: Montserrat
+* **Text Styles**:
+    * **Title**: Montserrat, Bold, Large
+    * **Body**: Poppins, Regular, Medium
+    * **CTA**: Poppins, Semi-bold, Medium, White text on Forest Green background
+
+### Color Usage
+* **Primary Color Usage**:
+    * Navigation title
+    * 'Get Recommendations' button background
+* **Accent Color Usage**:
+    * Input field borders when active
+    * 'Auto-fill' link
+
+### Tone & Persona
+* **Emotional Goals**: The screen should feel **provide a sense of control over personalized advice, build confidence in the relevance of information.**.
+* **Persona Notes**: Guided, encouraging. 'Tell us about [Dog's Name] for tailored advice.' 'We'll help you make the best choices.'
+
+---
+
+# Screen: Receive Personalized Insights
+
+The main purpose of this screen is to to present personalized vaccination recommendations and explanations based on the dog's profile.
+
+---
+
+## Key Features & Content Sections
+
+### Primary Features
+* Vet-Verified Knowledge Hub
+
+### On-Screen Sections & Grouping Logic
+* **Recommendations for [Dog's Name]**: Recommendations for [Dog's Name] description not found.
+* **Understanding the Recommendations**: Understanding the Recommendations description not found.
+* **Related Topics**: Related Topics description not found.
+
+---
+
+## Layout & Hierarchy
+
+* **Layout Type**: List.
+* **Hierarchy**: The main recommendation summary will be prominent. Each recommendation will be clearly stated, with its reasoning explained below. 'Learn More' links will be visually distinct. Trust badges will reinforce the vet-verified nature of the advice.
+* **Component Placement**: A top app bar with a clear title and a back button to return to 'Input Dog's Profile Details'. A 'Share Insights' button in the top right allows users to easily share this personalized information. 'Learn More' links are placed inline with each recommendation to provide deeper context. Swipe gesture for back navigation.
+* **Progressive Disclosure**: This is **enabled**.
+
+---
+
+## Navigation
+
+### Navigation Logic
+Users navigate here from 'Input Dog's Profile Details' after submitting their dog's information. Returns to 'Input Dog's Profile Details' via back button/gesture. 'Learn More' pushes to relevant 'View Educational Articles/Videos'. 'Share Insights' opens a native share sheet.
+
+### User Clarity
+* **Where am I?**: On the Personalized Vaccination Insights screen for [Dog's Name].
+* **What can I do?**: Review tailored recommendations, understand the reasoning, or explore related topics.
+
+### Navigation Title
+*This screen's navigation bar title is **Your Personalized Insights**.*
+
+### Navigation Components
+* System Back Button: ✅
+* Swipe Gesture: ✅
+* Inline Contextual Action: ✅
+* Top App Bar: ✅
+* Top Right Action Button: ✅
+
+### Defined User Actions
+* Share Insights
+* Learn More
+
+### Routes from this Screen
+* **Trigger**: User taps back button or swipes back.
+    * **From**: `Receive Personalized Insights (Back Button/Gesture)`
+    * **To**: `Input Dog's Profile Details`
+
+* **Trigger**: User taps 'Share Insights' icon.
+    * **From**: `Receive Personalized Insights (Share Insights Button)`
+    * **To**: `Share Sheet`
+
+* **Trigger**: User taps 'Learn More' link next to a recommendation.
+    * **From**: `Receive Personalized Insights (Learn More Link)`
+    * **To**: `View Educational Articles/Videos`
+
+### Linked Screens
+* Input Dog's Profile Details
+* View Educational Articles/Videos
+* Share Sheet
+
+---
+
+## Styling & Tone
+
+### Typography
+* **Primary Font**: Poppins
+* **Secondary Font**: Montserrat
+* **Text Styles**:
+    * **Title**: Montserrat, Bold, Large
+    * **Body**: Poppins, Regular, Medium
+    * **CTA**: Poppins, Semi-bold, Medium, White text on Forest Green background
+
+### Color Usage
+* **Primary Color Usage**:
+    * Navigation title
+    * 'Share Insights' icon
+* **Accent Color Usage**:
+    * Highlighting key recommendations
+    * 'Learn More' links
+    * trust badges
+
+### Tone & Persona
+* **Emotional Goals**: The screen should feel **provide clarity and confidence in health decisions, empower users with personalized knowledge.**.
+* **Persona Notes**: Authoritative, supportive, and clear. 'Here are the best vaccination insights for [Dog's Name].' 'Empowering you to make informed choices.'
 
 
 Strictly follow the below mentioned color scheme for generating UI. Be consistent.
 
 Do not deviate.
 
-Primary - "#007B7F"
+Primary - "#228B22"
 
-Secondary - "#FF6F61"
+Secondary - "#FFD700"
 
-Background- "#F4F4F4"
-  """
+Background- "#F8F8F8"
+"""
 }
 
 # The endpoint URL

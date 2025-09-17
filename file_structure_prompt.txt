@@ -1,12 +1,262 @@
 <system_instructions>
+I want you to act as an expert React developer. Your task is to generate the file/folder structure for a complete Vite+React+MUI application based on the provided specifications. After that, you will wait for me to ask you to code each file.
 
-I want to create a html css and js project. I want you to analyse screen_specifications and tell me a project structure. Respond with what files are needed to make this application fully function(give file names only {html: [html files' names with path], js: [js files' names with path]}. Do not code anything.) in the following format:
+# RULES:
+1.  **Analyze Specifications:** Carefully read the <screen_specifications> to understand the application's features, layout, and components.
+2.  **File Types:** You MUST create `jsx`, `js`, and `html` files only.
+3.  **Project Context:** The initial Vite+React+MUI project is already set up. You will be given the contents of existing files in the <files> section. You must work within this existing structure.
+4.  **Directory Structure:** You MUST organize the files into the following directory structure inside `src/` (It is no mandatory to include all the following files, just do it when it is a required thing. Example, for a simple todo application, you dont need a src/store, src/schemas, src/hooks. But for a flight booking app, you do.):
+    * `src/pages/`: For main screen/page components.
+    * `src/components/`: For small, reusable UI components (e.g., `SomeModal.jsx`, `CustomAlertModal.jsx`, etc).
+    * `src/layouts/`: For major layout components like `MainLayout.jsx` (e.g., a layout with a sidebar and header).
+    * `src/store/`: For Redux Toolkit files. Create a `store.js` and a `slices/` subdirectory. Each feature from the specs should have its own slice file (e.g., `src/store/slices/payoutsSlice.js`).
+    * `src/services/`: For API call functions using axios (e.g., `payoutsApi.js`). Never use APIs that would require some sort of setup. You can use only those that can be directly called and will get a response. If this is not possible, better stick by creating a mock data and then using it in project.
+    * `src/schemas/`: For Zod validation schemas (e.g., `payoutFormSchema.js`).
+    * `src/hooks/`: For custom React hooks.
+    * `src/theme.js`: The MUI theme configuration file. You must generate this file.
+    * `src/utils/`: For generic helper functions.
+    * `src/router.jsx`: This file should define the routes (/, /schedule, /progress, etc.) and map them to the page components.
+5.  **Font and Theme:**
+    * The user **will** specify a font and color palette in the <screen_specifications>.
+    * You MUST use the provided <font_links> to select the correct `<link>` tag.
+    * This font `<link>` MUST be added to the `<head>` of the `index.html` file.
+    * The font family and color palette MUST be correctly configured in the `src/theme.js` file you generate.
 
-{html: [html files' names with path], js: [js files' names with path]}
-# IMPORTANT
-
-- Always create an entry point for the app to start. If there are more than single user for the application, you must route this using the login page.First generate index.html (entry point).
-
-- Put the files in respective paths. Example: js/utils/.. or js/components/ or js/<user specific folder name>. This is optional but recommended.
-
+# IMPORTANT:
+- **Phase 1 (Current Task):** Your ONLY output for this prompt MUST be a JSON object representing the file structure. DO NOT write any code yet. Use the format shown in <file_structure_example>.
+- **Phase 2 (Next Steps):** After I approve the file structure, I will ask you to generate the code for each file, one by one or in small groups. Do not proceed to Phase 2 until I instruct you to.
 </system_instructions>
+
+
+<file_structure_example>
+{
+  "Phase 1": {
+    "description": "Core setup: theme, router, global state",
+    "batches": {
+      "Batch 1": {
+        "description": "Essential configs and main slices",
+        "files": [
+          "src/theme.js",
+          "src/router.jsx",
+          "src/store/store.js",
+          "src/store/slices/searchSlice.js",
+          "src/store/slices/flightsSlice.js"
+        ]
+      },
+      "Batch 2": {
+        "description": "API layer, mock data, additional slice",
+        "files": [
+          "src/store/slices/bookingSlice.js",
+          "src/services/api.js",
+          "src/services/mockData.js",
+          "src/hooks/useFlights.js"
+        ]
+      },
+      "Batch 3": {
+        "description": "Utility functions and form schemas",
+        "files": [
+          "src/utils/formatDate.js",
+          "src/utils/formatCurrency.js",
+          "src/schemas/searchFormSchema.js",
+          "src/schemas/paymentFormSchema.js"
+        ]
+      }
+    }
+  },
+  "Phase 2": {
+    "description": "Layouts & Shared Components",
+    "batches": {
+      "Batch 4": {
+        "description": "Main layouts and App entry point",
+        "files": [
+          "src/App.jsx",
+          "src/layouts/MainLayout.jsx",
+          "src/layouts/BookingLayout.jsx"
+        ]
+      },
+      "Batch 5": {
+        "description": "Reusable components like top bar, bottom nav, payment options",
+        "files": [
+          "src/components/shared/BottomNavBar.jsx",
+          "src/components/shared/TopAppBar.jsx",
+          "src/components/booking/PaymentOptions.jsx"
+        ]
+      }
+    }
+  }
+}
+</file_structure_example>
+
+<files>
+
+<package.json>
+{
+  "name": "my-vite-app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^7.3.2",
+    "@mui/material": "^7.3.2",
+    "@reduxjs/toolkit": "^2.9.0",
+    "axios": "^1.12.2",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-hook-form": "^7.62.0",
+    "react-redux": "^9.2.0",
+    "zod": "^4.1.8"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.33.0",
+    "@types/react": "^19.1.10",
+    "@types/react-dom": "^19.1.7",
+    "@vitejs/plugin-react": "^5.0.0",
+    "eslint": "^9.33.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "globals": "^16.3.0",
+    "vite": "^7.1.2"
+  }
+}
+</package.json>
+
+<vite.config.js>
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [react()],
+})
+</vite.config.js>
+
+<index.html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    />
+
+    <title>Vite + React</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+</index.html>
+
+<eslint.config.js>
+import js from '@eslint/js'
+import globals from 'globals'
+import reactHooks from 'eslint-plugin-react-hooks'
+import reactRefresh from 'eslint-plugin-react-refresh'
+import { defineConfig, globalIgnores } from 'eslint/config'
+
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{js,jsx}'],
+    extends: [
+      js.configs.recommended,
+      reactHooks.configs['recommended-latest'],
+      reactRefresh.configs.vite,
+    ],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.browser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        ecmaFeatures: { jsx: true },
+        sourceType: 'module',
+      },
+    },
+    rules: {
+      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+    },
+  },
+])
+</eslint.config.js>
+
+<main.jsx>
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App.jsx';
+
+import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles';
+import theme from './theme';
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <CssVarsProvider theme={theme}>
+      <App />
+    </CssVarsProvider>
+  </React.StrictMode>,
+);
+</main.jsx>
+
+<theme.js>
+import { experimental_extendTheme as extendTheme } from '@mui/material/styles';
+
+const theme = extendTheme({
+   colorSchemes: { // change as requested by user
+    light: {
+      palette: {
+        primary: {
+          main: '#6750A4',
+        },
+        secondary: {
+          main: '#625B71',
+        },
+      },
+    },
+    dark: {
+      palette: {
+        primary: {
+          main: '#D0BCFF',
+        },
+        secondary: {
+          main: '#CCC2DC',
+        },
+      },
+    },
+  },
+
+  typography: {
+    fontFamily: [
+      'Playfair Display', // The font you want to use
+      'Roboto',           // The fallback font
+    ].join(','),
+  },
+});
+
+export default theme;
+</theme.js>
+
+</files>
+
+<font_links>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+</font_links>

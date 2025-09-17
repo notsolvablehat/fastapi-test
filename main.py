@@ -38,7 +38,6 @@ except FileNotFoundError as e:
     logger.error(f"Prompt file not found: {e}. 'file_structure_prompt' will be empty.")
     file_structure_prompt = ""
 
-# This dictionary will hold our shared resources for DB and AI clients.
 app_state = {}
 
 @asynccontextmanager
@@ -57,19 +56,31 @@ async def lifespan(app: FastAPI):
 
     yield
 
-    # Clean up resources on shutdown
     logger.info("Application shutting down...")
     mongo_client.close()
     logger.info("Database connection closed.")
 
+class Batch(BaseModel):
+    name: str
+    description: str
+    files: List[str]
+
+class Phase(BaseModel):
+    name: str
+    description: str
+    batches: List[Batch]
+
 class FilesResponse(BaseModel):
-    html: List[str]
-    js: List[str]
+    phases: List[Phase]
 
 class GeneratedCodeFile(BaseModel):
     name: str
     content: str
     description: str = Field(..., description="A brief, human-readable description of what this AI-generated code file does.")
+
+class GeneratedCodeFiles(BaseModel):
+    """A list of generated code files for a batch."""
+    files: List[GeneratedCodeFile]
 
 class PromptRequest(BaseModel):
     project_id: str
@@ -81,7 +92,7 @@ app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000"],
+    allow_origins=["http://localhost:8080", "http://127.0.0.1:5173", "http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -101,8 +112,10 @@ async def _create_file_template(request: PromptRequest, db, genai_client) -> dic
             response_schema=FilesResponse,
             response_mime_type="application/json",
             thinking_config = genai.types.ThinkingConfig(
-                thinking_budget=10000,
+                thinking_budget=2000,
             ),
+            top_p=0.5,
+            temperature=0.5
         ),
         contents=[request.prompt],
     )
@@ -132,43 +145,56 @@ async def _generate_file_content_stream(request: PromptRequest, file_structure: 
     First, carefully review this entire file architecture...
     # RULES
     {steps_prompt}
-    # File architecture:
-    {json.dumps(file_structure, indent=2)}
-    # Screen specifications:
+    <screen_specifications>:
     {request.prompt}
-    Acknowledge that you have understood the architecture.
+    <screen_specifications>
+    <batches_to_generate>
+    {file_structure}
+    </batches_to_generate>
+    Acknowledge that you have understood the architecture and are ready to build.
     """
     chat.send_message(initial_prompt)
     logger.info("Gemini acknowledged and is ready to create the files.")
 
-    process_order, batch_size = ["js", "html"], 8
     all_batches = [
-        {"category": category, "files": file_structure[category][i:i + batch_size]}
-        for category in process_order if category in file_structure
-        for i in range(0, len(file_structure[category]), batch_size)
+        batch
+        for phase in file_structure.get("phases", [])
+        for batch in phase.get("batches", [])
     ]
 
     total_batches = len(all_batches)
-    for i, batch_info in enumerate(all_batches):
-        category, files_to_generate = batch_info["category"], batch_info["files"]
-        generation_prompt = f"Generate the code for all files in this batch: {json.dumps(files_to_generate)}"
+    for i, batch in enumerate(all_batches):
+        files_to_generate = batch["files"]
+        batch_name = batch["name"]
+        generation_prompt = f"Generate the code for all files in this batch: {json.dumps(files_to_generate, indent=2)}"
 
         try:
-            progress_message = f"Generating files... (Batch {i+1}/{total_batches})"
+            progress_message = f"Generating batch {i+1}/{total_batches}: {batch_name}"
             yield json.dumps({"status": "progress", "message": progress_message, "files": files_to_generate}) + "\n"
             logger.info(f"{progress_message} for project {request.project_id}")
 
             response = chat.send_message(
                 generation_prompt,
-                config={"response_mime_type": "application/json", "response_schema": list[GeneratedCodeFile]}
+                config={
+                    "response_mime_type": "application/json",
+                    "response_schema": GeneratedCodeFiles,
+                    "top_p": 0.5,
+                    "temperature": 0.5,
+                    "thinking_config": genai.types.ThinkingConfig(
+                            thinking_budget=2000
+                        ),
+                }
             )
-            generated_batch_data: list[GeneratedCodeFile] = response.parsed
+            generated_batch_data: List[GeneratedCodeFile] = response.parsed.files
 
             batch_documents = [
                 {
                     "project_id": request.project_id, "file_id": request.file_id,
-                    "path": f.name, "file_type": category, "content": f.content,
-                    "created_at": datetime.now(timezone.utc), "description": f.description
+                    "path": f.name,
+                    "file_type": f.name.split('.')[-1] if '.' in f.name else 'unknown',
+                    "content": f.content,
+                    "created_at": datetime.now(timezone.utc),
+                    "description": f.description
                 } for f in generated_batch_data
             ]
 
@@ -176,12 +202,14 @@ async def _generate_file_content_stream(request: PromptRequest, file_structure: 
                 generated_files_coll.insert_many(batch_documents)
                 files_info = [{"path": doc["path"], "file_type": doc["file_type"]} for doc in batch_documents]
                 yield json.dumps({
-                    "status": "progress", "message": f"Translating UX context into UI... (Batch {i+1}/{total_batches})", "data": files_info
+                    "status": "progress",
+                    "message": f"Translating UX context into UI... (Batch {i+1}/{total_batches} complete)",
+                    "data": files_info
                 }) + "\n"
-            # await asyncio.sleep(30)
+
         except Exception as e:
-            logger.error(f"FAILED during batch generation for {files_to_generate}: {e}")
-            yield json.dumps({"status": "error", "message": f"Failed during batch generation: {e}"}) + "\n"
+            logger.error(f"FAILED during batch generation for {batch_name}: {e}", exc_info=True)
+            yield json.dumps({"status": "error", "message": f"Failed during batch generation for '{batch_name}': {str(e)}"}) + "\n"
             continue
 
 
@@ -223,11 +251,11 @@ async def get_or_generate_files(request: PromptRequest):
 
     existing_files = list(gen_files_coll.find(
         {"project_id": request.project_id, "file_id": request.file_id},
-        {"_id": 0}
+        {"_id": 0, "created_at": 0}
     ))
 
     if existing_files:
-        logger.info(f"Files found in cache for project {request.project_id}. Returning them.")
+        logger.info(f"Files found in cache for project {request.project_id} & {request.file_id}. Returning them.")
         return JSONResponse(
             status_code=200,
             content={"status": "complete", "message": "Files already exist in DB.", "data": existing_files}
